@@ -1,4 +1,4 @@
-package main.bsrCalculator
+package bsrCalculator
 
 import java.text.DecimalFormat
 import java.util.*
