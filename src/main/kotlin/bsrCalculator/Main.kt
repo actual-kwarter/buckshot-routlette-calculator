@@ -1,3 +1,5 @@
+package main.bsrCalculator
+
 import java.text.DecimalFormat
 import java.util.*
 

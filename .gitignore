@@ -6,6 +6,7 @@ out/
 
 ### Gradle ###
 .gradle
+/build
 
 ### Eclipse ###
 .apt_generated

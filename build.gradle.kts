@@ -1,4 +1,5 @@
 plugins {
+    application
     kotlin("jvm") version "1.9.23"
 }
 
@@ -16,6 +17,11 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+application {
+    mainClass.set("bsrCalculator.Main")
+}
+
 kotlin {
     jvmToolchain(21)
 }
