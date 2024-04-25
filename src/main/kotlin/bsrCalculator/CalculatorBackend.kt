@@ -29,6 +29,11 @@ fun populateShellLineUp(gs: GameState, rawShells: String?) {
 }
 
 fun cycleShell(gs: GameState, shellType: ShellType) {
+    if (gs.shellLineup.size == 1) {
+        println("Last shell in shotgun, no action taken.")
+        return
+    }
+
     if (shellType == ShellType.LIVE) {
         if (liveRemaining == 0) {
             println("No live shells remaining.")
