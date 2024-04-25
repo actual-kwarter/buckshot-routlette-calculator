@@ -8,6 +8,9 @@ out/
 .gradle
 /build
 
+### Dev Stuff ###
+build-instructions.txt
+
 ### Eclipse ###
 .apt_generated
 .classpath
