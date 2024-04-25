@@ -5,6 +5,8 @@ game [Buckshot Roulette](https://store.steampowered.com/app/2835570/Buckshot_Rou
 that calculates the chance of the current shell in the shotgun being a blank or a
 live shell.
 
+![image](./bsrExample.png)
+
 ## Installation
 
 1. Download
