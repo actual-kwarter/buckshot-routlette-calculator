@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.actual-kwarter"
-version = "1.0.1"
+version = "1.0.2"
 
 repositories {
     mavenCentral()
@@ -34,7 +34,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "bsrCalculator"
-            packageVersion = "1.0.1"
+            packageVersion = "$version"
         }
     }
 }

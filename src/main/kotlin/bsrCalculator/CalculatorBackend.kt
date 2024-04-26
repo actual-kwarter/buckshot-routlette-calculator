@@ -2,30 +2,27 @@ package bsrCalculator
 
 import java.util.*
 
-private var scanner: Scanner = Scanner(System.`in`)
 private var liveTotal: Int = 0
-private var liveRemaining: Int = 0
 private var blankTotal: Int = 0
-private var blankRemaining: Int = 0
 
-fun reset(shellLineup: MutableList<ShellType>) {
+fun reset(gs: GameState) {
     liveTotal = 0
-    liveRemaining = 0
+    gs.liveRemaining = 0
     blankTotal = 0
-    blankRemaining = 0
-    shellLineup.clear()
+    gs.blankRemaining = 0
+    gs.shellLineup.clear()
 }
 
 fun populateShellLineUp(gs: GameState, rawShells: String?) {
     if (rawShells.isNullOrBlank()) return
 
-    reset(gs.shellLineup)
+    reset(gs)
 
-    liveRemaining = rawShells.substring(0, 1).toInt()
-    blankRemaining = rawShells.substring(2, 3).toInt()
-    liveTotal = liveRemaining
-    blankTotal = blankRemaining
-    fillArray(gs.shellLineup, (liveRemaining + blankRemaining))
+    gs.liveRemaining = rawShells.substring(0, 1).toInt()
+    gs.blankRemaining = rawShells.substring(2, 3).toInt()
+    liveTotal = gs.liveRemaining
+    blankTotal = gs.blankRemaining
+    fillArray(gs.shellLineup, (gs.liveRemaining + gs.blankRemaining))
 }
 
 fun cycleShell(gs: GameState, shellType: ShellType) {
@@ -35,7 +32,7 @@ fun cycleShell(gs: GameState, shellType: ShellType) {
     }
 
     if (shellType == ShellType.LIVE) {
-        if (liveRemaining == 0) {
+        if (gs.liveRemaining == 0) {
             println("No live shells remaining.")
             gs.shellLineup.fill(ShellType.BLANK)
             return
@@ -47,9 +44,9 @@ fun cycleShell(gs: GameState, shellType: ShellType) {
         }
 
         println("Live fired.")
-        liveRemaining--
+        gs.liveRemaining--
     } else {
-        if (blankRemaining == 0) {
+        if (gs.blankRemaining == 0) {
             println("No blank shells remaining.")
             gs.shellLineup.fill(ShellType.LIVE)
             return
@@ -61,26 +58,26 @@ fun cycleShell(gs: GameState, shellType: ShellType) {
         }
 
         println("Blank cycled.")
-        blankRemaining--
+        gs.blankRemaining--
     }
 
     gs.shellLineup.removeFirst()
-    checkRemainingShells(gs.shellLineup)
+    checkRemainingShells(gs)
 }
 
-fun checkRemainingShells(shellLineup: MutableList<ShellType>) {
-    if (!shellLineup.contains(ShellType.UNKNOWN)) return
-    if (liveRemaining == 0) {
-        shellLineup.fill(ShellType.BLANK)
+fun checkRemainingShells(gs: GameState) {
+    if (!gs.shellLineup.contains(ShellType.UNKNOWN)) return
+    if (gs.liveRemaining == 0) {
+        gs.shellLineup.fill(ShellType.BLANK)
     }
-    if (blankRemaining == 0) {
-        shellLineup.fill(ShellType.LIVE)
+    if (gs.blankRemaining == 0) {
+        gs.shellLineup.fill(ShellType.LIVE)
     }
 }
 
 fun updateOdds(gs: GameState) {
     //No live remaining
-    if (liveRemaining == 0 || gs.shellLineup[0] == ShellType.BLANK) {
+    if (gs.liveRemaining == 0 && gs.shellLineup[0] == ShellType.BLANK) {
         gs.liveChance = 0
         gs.blankChance = 100
         gs.shellLineup[0] = ShellType.BLANK
@@ -88,15 +85,15 @@ fun updateOdds(gs: GameState) {
     }
 
     //No blank remaining
-    if (blankRemaining == 0 || gs.shellLineup[0] == ShellType.LIVE) {
+    if (gs.blankRemaining == 0 && gs.shellLineup[0] == ShellType.LIVE) {
         gs.liveChance = 100
         gs.blankChance = 0
         gs.shellLineup[0] = ShellType.LIVE
         return
     }
 
-    val remainingUnknownBlank = blankRemaining - getShellCount(gs.shellLineup, ShellType.BLANK)
-    val remainingUnknownLive = liveRemaining - getShellCount(gs.shellLineup, ShellType.LIVE)
+    val remainingUnknownBlank = gs.blankRemaining - getShellCount(gs.shellLineup, ShellType.BLANK)
+    val remainingUnknownLive = gs.liveRemaining - getShellCount(gs.shellLineup, ShellType.LIVE)
 
     //Equal amounts of unknown shells remain
     if (gs.shellLineup.size > 1 && remainingUnknownBlank == remainingUnknownLive) {

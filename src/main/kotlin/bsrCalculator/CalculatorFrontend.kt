@@ -13,11 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import bsrCalculator.Shared.BLANK_CHANCE_PREFIX
+import bsrCalculator.Shared.BLANK_REMAINING_PREFIX
 import bsrCalculator.Shared.LIVE_CHANCE_PREFIX
+import bsrCalculator.Shared.LIVE_REMAINING_PREFIX
 import bsrCalculator.Shared.blankChance
 import bsrCalculator.Shared.blankChanceDisplay
+import bsrCalculator.Shared.blankRemaining
+import bsrCalculator.Shared.blankRemainingDisplay
 import bsrCalculator.Shared.liveChance
 import bsrCalculator.Shared.liveChanceDisplay
+import bsrCalculator.Shared.liveRemaining
+import bsrCalculator.Shared.liveRemainingDisplay
 import bsrCalculator.Shared.shellLineup
 import bsrCalculator.Shared.shellLineupDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,21 +34,31 @@ object Shared {
 
     var liveChance = 0
     const val LIVE_CHANCE_PREFIX = "Live shell chance: "
-    val liveChanceDisplay = MutableStateFlow("$LIVE_CHANCE_PREFIX$liveChance%")
+    val liveChanceDisplay = MutableStateFlow("${LIVE_CHANCE_PREFIX}?")
 
     var blankChance = 0
     const val BLANK_CHANCE_PREFIX = "Blank shell chance: "
-    val blankChanceDisplay = MutableStateFlow("$BLANK_CHANCE_PREFIX${blankChance}%")
+    val blankChanceDisplay = MutableStateFlow("${BLANK_CHANCE_PREFIX}?")
+
+    var liveRemaining = 0
+    const val LIVE_REMAINING_PREFIX = "Live shells remaining: "
+    val liveRemainingDisplay = MutableStateFlow("${LIVE_REMAINING_PREFIX}?")
+
+    var blankRemaining = 0
+    const val BLANK_REMAINING_PREFIX = "Blank shells remaining: "
+    val blankRemainingDisplay = MutableStateFlow("${BLANK_REMAINING_PREFIX}?")
 }
 
 @Composable
 @Preview
 fun CalculatorFrontend() {
-    val gs = GameState(shellLineup, liveChance, blankChance)
+    val gs = GameState(shellLineup, liveChance, blankChance, liveRemaining, blankRemaining)
 
     val shellLineupDisplayState by shellLineupDisplay.collectAsState()
     val liveChanceDisplayState by liveChanceDisplay.collectAsState()
     val blankChanceDisplayState by blankChanceDisplay.collectAsState()
+    val liveRemainingDisplayState by liveRemainingDisplay.collectAsState()
+    val blankRemainingDisplayState by blankRemainingDisplay.collectAsState()
 
     var lineupInput by remember { mutableStateOf("") }
     var isLineupValid by remember { mutableStateOf(true) }
@@ -69,6 +85,7 @@ fun CalculatorFrontend() {
                         populateShellLineUp(gs, lineupInput)
                         updateOdds(gs)
                         updateGameStateDisplay(gs)
+                        lineupInput = ""
                     }
                 }) { Text("Submit Round Lineup") }
             }
@@ -89,12 +106,15 @@ fun CalculatorFrontend() {
                         addShellKnowledge(gs, knowledgeInput)
                         updateOdds(gs)
                         updateGameStateDisplay(gs)
+                        knowledgeInput = ""
                     }
                 }) { Text("Submit Shell Knowledge") }
             }
             Text(text = shellLineupDisplayState)
             Text(text = liveChanceDisplayState)
             Text(text = blankChanceDisplayState)
+            Text(text = liveRemainingDisplayState)
+            Text(text = blankRemainingDisplayState)
             Row {
                 Button(
                     modifier = Modifier.padding(10.dp),
@@ -135,6 +155,12 @@ fun checkKnowledgeIsValid(input: String): Boolean {
 
 fun updateGameStateDisplay(gs: GameState) {
     shellLineupDisplay.value = gs.shellLineup.toString()
-    liveChanceDisplay.value = "$LIVE_CHANCE_PREFIX${gs.liveChance}%"
-    blankChanceDisplay.value = "$BLANK_CHANCE_PREFIX${gs.blankChance}%"
+    liveChanceDisplay.value = "$LIVE_CHANCE_PREFIX${displayQuestionInsteadOfZero(gs.liveChance)}"
+    blankChanceDisplay.value = "$BLANK_CHANCE_PREFIX${displayQuestionInsteadOfZero(gs.blankChance)}"
+    liveRemainingDisplay.value = "$LIVE_REMAINING_PREFIX${gs.liveRemaining}"
+    blankRemainingDisplay.value = "$BLANK_REMAINING_PREFIX${gs.blankRemaining}"
+}
+
+fun displayQuestionInsteadOfZero(chance: Int): String {
+    return if (chance == 0) "?" else "${chance}%"
 }
